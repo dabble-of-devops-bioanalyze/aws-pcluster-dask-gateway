@@ -1,0 +1,6 @@
+dask-gateway
+dask-gateway-server[local]
+dask-gateway-server[jobqueue]
+datasize
+humanize
+aws-pcluster-helpers
