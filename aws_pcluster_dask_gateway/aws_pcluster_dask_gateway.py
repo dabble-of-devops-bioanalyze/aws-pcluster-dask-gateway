@@ -6,7 +6,6 @@ import functools
 import os
 
 from jinja2 import Environment, BaseLoader
-# from pydantic.dataclasses import dataclass
 import dataclasses
 from typing import List, Any, TypedDict, Dict, Optional
 from typing import ForwardRef
@@ -46,6 +45,7 @@ from dask_gateway_server.backends.jobqueue.slurm import SlurmClusterConfig, Slur
 from dask_gateway_server.options import Options, Select
 from dask_gateway_server.options import Options, Select, String
 from dask_gateway_server.traitlets import Command, Type
+from pydantic import BaseModel, computed_field
 
 logger = setup_logger('dask-gateway')
 
@@ -58,7 +58,6 @@ https://gateway.dask.org/install-jobqueue.html
 """
 
 
-# @dataclasses.dataclass
 class DaskGatewaySlurmConfig(sinfo.SInfoTable):
     """
     Configure the Dask Gateway Cluster
@@ -84,8 +83,9 @@ class DaskGatewaySlurmConfig(sinfo.SInfoTable):
           }
     """
 
+    @computed_field
     @property
-    def profiles(self):
+    def profiles(self) -> Dict[str, Dict[str, Any]]:
         profiles = {}
         for sinfo_row in self.rows:
             label = f"P: {sinfo_row.queue}, I: {sinfo_row.ec2_instance_type}, CPU: {sinfo_row.vcpu}, Mem: {sinfo_row.mem}"
@@ -162,7 +162,7 @@ class PClusterBackend(SlurmBackend):
         help="The path to the dask-gateway-jobqueue-launcher executable", config=True
     )
     cluster_start_timeout = Float(
-        1200,
+        3600,
         help="""
           Timeout (in seconds) before giving up on a starting dask cluster. Slurm requires a much longer startup time!
           """,
@@ -170,7 +170,7 @@ class PClusterBackend(SlurmBackend):
     )
 
     worker_start_timeout = Float(
-        1200,
+        3600,
         help="""
           Timeout (in seconds) before giving up on a starting dask worker. Slurm requires a much longer startup time!
           """,

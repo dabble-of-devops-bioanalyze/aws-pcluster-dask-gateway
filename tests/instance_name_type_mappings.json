@@ -1,0 +1,61 @@
+{
+    "dev": {
+        "m5axlarge": "m5a.xlarge",
+        "m5a2xlarge": "m5a.2xlarge",
+        "m5a4xlarge": "m5a.4xlarge",
+        "m5a8xlarge": "m5a.8xlarge",
+        "m5a12xlarge": "m5a.12xlarge"
+    },
+    "dev-low": {
+        "t3amedium": "t3a.medium",
+        "t3alarge": "t3a.large",
+        "t3axlarge": "t3a.xlarge",
+        "t3a2xlarge": "t3a.2xlarge",
+        "m6i2xlarge": "m6i.2xlarge"
+    },
+    "dev-high": {
+        "m6i8xlarge": "m6i.8xlarge",
+        "m6i12xlarge": "m6i.12xlarge",
+        "m6i16xlarge": "m6i.16xlarge",
+        "m6i24xlarge": "m6i.24xlarge",
+        "m6i32xlarge": "m6i.32xlarge"
+    },
+    "memory-low": {
+        "r6i4xlarge": "r6i.4xlarge",
+        "r6i8xlarge": "r6i.8xlarge",
+        "r6i12xlarge": "r6i.12xlarge",
+        "r6i16xlarge": "r6i.16xlarge",
+        "r6i24xlarge": "r6i.24xlarge"
+    },
+    "memory-high": {
+        "r6i24xlarge": "r6i.24xlarge",
+        "r5ad24xlarge": "r5ad.24xlarge",
+        "r6i32xlarge": "r6i.32xlarge"
+    },
+    "compute-low": {
+        "c6i4xlarge": "c6i.4xlarge",
+        "c6i8xlarge": "c6i.8xlarge",
+        "c6i12xlarge": "c6i.12xlarge",
+        "c6i16xlarge": "c6i.16xlarge",
+        "c518xlarge": "c5.18xlarge"
+    },
+    "compute-high": {
+        "c6i24xlarge": "c6i.24xlarge",
+        "c6i32xlarge": "c6i.32xlarge",
+        "c524xlarge": "c5.24xlarge",
+        "c5n18xlarge": "c5n.18xlarge",
+        "c5d24xlarge": "c5d.24xlarge"
+    },
+    "gpu-1": {
+        "g22xlarge": "g2.2xlarge",
+        "g28xlarge": "g2.8xlarge",
+        "g4dn8xlarge": "g4dn.8xlarge",
+        "g4dn12xlarge": "g4dn.12xlarge",
+        "g4dn16xlarge": "g4dn.16xlarge"
+    },
+    "gpu-2": {
+        "g4dn8xlarge": "g4dn.8xlarge",
+        "g4dn16xlarge": "g4dn.16xlarge",
+        "g4dn12xlarge": "g4dn.12xlarge"
+    }
+}

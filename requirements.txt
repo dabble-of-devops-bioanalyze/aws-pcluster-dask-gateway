@@ -1,6 +1,9 @@
-dask-gateway
 dask-gateway-server[local]
 dask-gateway-server[jobqueue]
 datasize
 humanize
-aws-pcluster-helpers
+aws-pcluster-helpers>=3.5
+typer
+# conda
+#pangeo-notebook==2023.09.12
+#pangeo-dask==2023.09.11
