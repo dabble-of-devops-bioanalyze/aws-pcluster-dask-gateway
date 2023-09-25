@@ -18,6 +18,7 @@ Features
 --------
 
 * Automatically parses parallelcluster's config files to generate a dask-gateway template. 
+* Uses the jupyterhub-kubernetes profiles to list CPU/GPU
 
 Credits
 -------
