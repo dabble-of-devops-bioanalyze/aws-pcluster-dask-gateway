@@ -1,0 +1,1 @@
+aws_pcluster_dask_gateway/_version.py export-subst
