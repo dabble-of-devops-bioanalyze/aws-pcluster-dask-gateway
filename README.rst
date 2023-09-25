@@ -2,7 +2,6 @@
 aws_pcluster_dask_gateway
 =========================
 
-
 .. image:: https://img.shields.io/pypi/v/aws_pcluster_dask_gateway.svg
         :target: https://pypi.python.org/pypi/aws_pcluster_dask_gateway
 
