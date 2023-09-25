@@ -45,9 +45,10 @@ setup(
     packages=find_packages(include=['aws_pcluster_dask_gateway', 'aws_pcluster_dask_gateway.*']),
     test_suite='tests',
     tests_require=test_requirements,
-    url='https://github.com/dabble-of-devops-bioanalyze/aws_pcluster_helpers',
+    url='https://github.com/dabble-of-devops-bioanalyze/aws_pcluster_dask_gateway',
     zip_safe=False,
     # version="0.1.0",
+    # version="3.5.1",
     version=versioneer.get_version(),
     cmdclass=versioneer.get_cmdclass(),
 )
