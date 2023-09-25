@@ -6,15 +6,6 @@ aws_pcluster_dask_gateway
 .. image:: https://img.shields.io/pypi/v/aws_pcluster_dask_gateway.svg
         :target: https://pypi.python.org/pypi/aws_pcluster_dask_gateway
 
-.. image:: https://img.shields.io/travis/bioanalyze/aws_pcluster_dask_gateway.svg
-        :target: https://travis-ci.com/bioanalyze/aws_pcluster_dask_gateway
-
-.. image:: https://readthedocs.org/projects/aws-pcluster-dask-gateway/badge/?version=latest
-        :target: https://aws-pcluster-dask-gateway.readthedocs.io/en/latest/?version=latest
-        :alt: Documentation Status
-
-
-
 
 A helper function to configure Dask Gateway to play nice with AWS PCluster
 
@@ -26,7 +17,7 @@ A helper function to configure Dask Gateway to play nice with AWS PCluster
 Features
 --------
 
-* TODO
+* Automatically parses parallelcluster's config files to generate a dask-gateway template. 
 
 Credits
 -------
