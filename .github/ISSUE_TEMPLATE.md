@@ -1,4 +1,4 @@
-* aws_pcluster_dask_gateway version:
+* aws_pcluster_bootstrap_helpers version:
 * Python version:
 * Operating System:
 
