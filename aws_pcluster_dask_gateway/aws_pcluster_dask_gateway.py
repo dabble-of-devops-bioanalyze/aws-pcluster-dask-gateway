@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import shutil
-from aws_pcluster_helpers.models.sinfo import (SInfoTable, SinfoRow)
+from aws_pcluster_helpers.models.sinfo import SInfoTable, SinfoRow
 import functools
 import os
 
@@ -27,7 +27,7 @@ from aws_pcluster_helpers.models.instance_types_data import (
     InstanceTypesMappings,
 )
 
-from aws_pcluster_helpers.models import sinfo
+from aws_pcluster_helpers.models.sinfo import SInfoTable, SinfoRow
 from aws_pcluster_helpers import (
     PClusterConfig,
     InstanceTypesData,
@@ -41,13 +41,17 @@ from aws_pcluster_helpers.models.config import PClusterConfigFiles
 from traitlets import Unicode, default
 from traitlets import Bool, Float, Integer, List, Unicode, default, validate
 
-from dask_gateway_server.backends.jobqueue.slurm import SlurmClusterConfig, SlurmBackend, slurm_format_memory
-from dask_gateway_server.options import Options, Select
 from dask_gateway_server.options import Options, Select, String
 from dask_gateway_server.traitlets import Command, Type
 from pydantic import BaseModel, computed_field
 
-logger = setup_logger('dask-gateway')
+from aws_pcluster_dask_gateway.dask_gateway_extensions.backends.jobqueue.slurm import (
+    SlurmClusterConfig,
+    SlurmBackend,
+    slurm_format_memory,
+)
+
+logger = setup_logger("dask-gateway")
 
 """
 Docs
@@ -58,7 +62,7 @@ https://gateway.dask.org/install-jobqueue.html
 """
 
 
-class DaskGatewaySlurmConfig(sinfo.SInfoTable):
+class DaskGatewaySlurmConfig(BaseModel):
     """
     Configure the Dask Gateway Cluster
     Each partition/instance type gets its own profile
@@ -82,12 +86,14 @@ class DaskGatewaySlurmConfig(sinfo.SInfoTable):
               "worker_memory": int(options.worker_memory * 2 ** 30)
           }
     """
+    pcluster_config_files: PClusterConfigFiles = PClusterConfigFiles()
 
     @computed_field
     @property
     def profiles(self) -> Dict[str, Dict[str, Any]]:
         profiles = {}
-        for sinfo_row in self.rows:
+        sinfo_table = SInfoTable(pcluster_config_files=self.pcluster_config_files)
+        for sinfo_row in sinfo_table.rows:
             label = f"P: {sinfo_row.queue}, I: {sinfo_row.ec2_instance_type}, CPU: {sinfo_row.vcpu}, Mem: {sinfo_row.mem}"
             memory = sinfo_row.mem / sinfo_row.vcpu
             # Using all of the available memory is very error prone
@@ -110,21 +116,32 @@ class DaskGatewaySlurmConfig(sinfo.SInfoTable):
 
 class PClusterConfig(SlurmClusterConfig):
     """Dask cluster configuration options when running on SLURM"""
+
     partition = Unicode("", help="The partition to submit jobs to.", config=True)
     qos = Unicode("", help="QOS string associated with each job.", config=True)
     account = Unicode("", help="Account string associated with each job.", config=True)
     constraint = Unicode("", help="The job instance type constraint.", config=True)
-    wall_time = Unicode("", help="The walltime. The cluster will be brought down after the wall time is complete.",
-                        config=True)
+    wall_time = Unicode(
+        "",
+        help="The walltime. The cluster will be brought down after the wall time is complete.",
+        config=True,
+    )
     scheduler_cmd = Command(
-        shutil.which("dask-scheduler"), help="Shell command to start a dask scheduler.", config=True
+        shutil.which("dask-scheduler"),
+        help="Shell command to start a dask scheduler.",
+        config=True,
     )
     worker_cmd = Command(
-        shutil.which("dask-worker"), help="Shell command to start a dask worker.", config=True
+        shutil.which("dask-worker"),
+        help="Shell command to start a dask worker.",
+        config=True,
     )
 
 
-def get_cluster_options(default_profile=None):
+def get_cluster_options(
+    default_profile=None,
+    pcluster_config_files: Optional[PClusterConfigFiles] = None
+):
     """
 
     In your dask_gateway_config.py set the cluster options to cluster_options
@@ -134,7 +151,10 @@ def get_cluster_options(default_profile=None):
     :param default_profile:
     :return:
     """
-    dask_gateway_slurm_config = DaskGatewaySlurmConfig()
+    if pcluster_config_files:
+        dask_gateway_slurm_config = DaskGatewaySlurmConfig(pcluster_config_files=pcluster_config_files)
+    else:
+        dask_gateway_slurm_config = DaskGatewaySlurmConfig()
     profile_names = list(dask_gateway_slurm_config.profiles.keys())
     if not default_profile:
         default_profile = profile_names[0]
@@ -147,19 +167,22 @@ def get_cluster_options(default_profile=None):
             default=default_profile,
             label="Cluster Profile",
         ),
-        String(
-            "environment",
-            label="Conda Environment"
-        ),
+        String("environment", label="Conda Environment"),
         handler=lambda options: dask_gateway_slurm_config.profiles[options.profile],
     )
 
 
 class PClusterBackend(SlurmBackend):
-    cluster_options = get_cluster_options()
+
+    # make sure to keep this as @property so its deferred
+    @property
+    def cluster_options(self) -> Any:
+        return get_cluster_options()
+
     dask_gateway_jobqueue_launcher = Unicode(
-        shutil.which('dask-gateway-jobqueue-launcher'),
-        help="The path to the dask-gateway-jobqueue-launcher executable", config=True
+        shutil.which("dask-gateway-jobqueue-launcher"),
+        help="The path to the dask-gateway-jobqueue-launcher executable",
+        config=True,
     )
     cluster_start_timeout = Float(
         3600,
@@ -225,7 +248,7 @@ class PClusterBackend(SlurmBackend):
             cmd.append("--constraint=" + str(cluster.config.constraint))
 
         if worker:
-            logger.info('Configuring dask-gateway worker')
+            logger.info("Configuring dask-gateway worker")
             cpus = cluster.config.worker_cores
             mem = slurm_format_memory(cluster.config.worker_memory)
             log_file = "dask-worker-%s.log" % worker.name
@@ -238,7 +261,7 @@ class PClusterBackend(SlurmBackend):
             )
             env = self.get_worker_env(cluster)
         else:
-            logger.info('Configuring dask-gateway scheduler')
+            logger.info("Configuring dask-gateway scheduler")
             cpus = cluster.config.scheduler_cores
             mem = slurm_format_memory(cluster.config.worker_memory)
             log_file = "dask-scheduler-%s.log" % cluster.name
@@ -264,7 +287,7 @@ class PClusterBackend(SlurmBackend):
             ]
         )
 
-        logger.info(f'Cmd: {cmd}')
-        logger.info(f'Env: {env}')
-        logger.info(f'Script: {script}')
+        logger.info(f"Cmd: {cmd}")
+        logger.info(f"Env: {env}")
+        logger.info(f"Script: {script}")
         return cmd, env, script

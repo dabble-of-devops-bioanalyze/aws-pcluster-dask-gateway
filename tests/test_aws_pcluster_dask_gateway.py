@@ -24,7 +24,6 @@ from aws_pcluster_helpers.models.config import (
     ENV_INSTANCE_TYPES_DATA_FILE,
     ENV_INSTANCE_TYPE_MAPPINGS_FILE,
 )
-from aws_pcluster_helpers.models.sinfo import SInfoTable, SinfoRow
 import yaml
 import json
 import os
@@ -33,6 +32,7 @@ from rich.console import Console
 
 from aws_pcluster_helpers.commands import cli_sinfo
 from aws_pcluster_helpers.commands import cli_gen_nxf_slurm_config
+from aws_pcluster_helpers.models.sinfo import SInfoTable, SinfoRow
 
 instance_types_data_file = os.path.join(
     os.path.dirname(__file__), "instance-types-data.json"
@@ -40,14 +40,15 @@ instance_types_data_file = os.path.join(
 instance_type_mapping_file = os.path.join(
     os.path.dirname(__file__), "instance_name_type_mappings.json"
 )
-pcluster_config_file = os.path.join(
-    os.path.dirname(__file__), "pcluster_config.yml"
-)
+pcluster_config_file = os.path.join(os.path.dirname(__file__), "pcluster_config.yml")
+
 os.environ[ENV_INSTANCE_TYPE_MAPPINGS_FILE] = instance_type_mapping_file
 os.environ[ENV_INSTANCE_TYPES_DATA_FILE] = instance_types_data_file
 os.environ[ENV_PCLUSTER_CONFIG_FILE] = pcluster_config_file
 
 logger = setup_logger(logger_name="tests", log_level="DEBUG")
+
+from aws_pcluster_dask_gateway import DaskGatewaySlurmConfig
 
 
 def test_files():
@@ -56,13 +57,11 @@ def test_files():
     assert os.path.exists(instance_types_data_file)
 
 
-def test_sinfo():
-    sinfo = SInfoTable()
-    table = sinfo.get_table()
-    console = Console()
-    console.print(table)
-
-
-def test_load_pcluster_config():
-    pcluster_config = PClusterConfig.from_yaml(pcluster_config_file)
-    assert pcluster_config
+def test_dask_gateway():
+    pcluster_config_files = PClusterConfigFiles(
+        pcluster_config_file=pcluster_config_file,
+        instance_types_data_file=instance_types_data_file,
+        instance_type_mapping_file=instance_type_mapping_file,
+    )
+    dask_gateway_options = DaskGatewaySlurmConfig(pcluster_config_files=pcluster_config_files)
+    assert dask_gateway_options

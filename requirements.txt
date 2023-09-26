@@ -1,7 +1,7 @@
-dask-gateway-server[local]
-dask-gateway-server[jobqueue]
+dask-gateway-server
 datasize
 humanize
+pydantic>2
 aws-pcluster-helpers>=3.5
 typer
 # conda
