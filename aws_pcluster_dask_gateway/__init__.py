@@ -11,3 +11,6 @@ from aws_pcluster_dask_gateway.aws_pcluster_dask_gateway import (
 from . import _version
 
 __version__ = _version.get_versions()["version"]
+
+from . import _version
+__version__ = _version.get_versions()['version']
